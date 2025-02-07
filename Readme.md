@@ -1,6 +1,6 @@
 ## Using Azure OpenAI o-series models usecase
 
-[azreu openAI reasoning model introduce](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/reasoning?tabs=python-secure)
+[azure openAI reasoning model introduce](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/reasoning?tabs=python-secure)
 
 Azure OpenAI o-series models are designed to tackle reasoning and problem-solving tasks with increased focus and capability.
 So I try to use LRM o1-preview,o1-mini,o1 and o3-mini as CPA teacher to anaysis the questions and give out the solution and final answer.
