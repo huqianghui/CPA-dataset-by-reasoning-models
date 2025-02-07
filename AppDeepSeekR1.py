@@ -2,8 +2,8 @@ import pandas as pd
 import os
 import json
 from dotenv import load_dotenv
-from prompt.cpaDeekSeekPrompt import cpa_deep_seek_system_prompt, cpa_deep_seek_user_prompt, cpa_deep_seek_assistant_prompt
-from azure.ai.inference.models import SystemMessage, UserMessage, AssistantMessage
+from prompt.cpaDeekSeekPrompt import cpa_deep_seek_system_prompt, cpa_deep_seek_user_prompt
+from azure.ai.inference.models import SystemMessage, UserMessage
 import asyncio
 import logging
 import re
@@ -18,8 +18,6 @@ from azure.ai.inference.aio import ChatCompletionsClient
 from azure.core.credentials import AzureKeyCredential
 
 
-
-
 ERROR_CODE = "ERR_001"
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -30,6 +28,7 @@ azureDeepSeekClient = ChatCompletionsClient(
     credential=AzureKeyCredential(os.environ["AZURE_INFERENCE_CREDENTIAL"]),
 )
 
+DEEPSEEK_R1_MODE_NAME="DeepSeek-R1"
 
 def sanitize_json_string(json_str: str) -> str:
     # Remove all control characters (ASCII 0-31)
@@ -52,10 +51,10 @@ async def answer_cpa_by_deepseek_r1_model(question:str,index:int):
         response = await azureDeepSeekClient.complete(
             messages=[
                 SystemMessage(content=str(cpa_deep_seek_system_prompt)),
-                UserMessage(content=str(user_cpa_question)),
-                AssistantMessage(content=str(cpa_deep_seek_assistant_prompt))
+                UserMessage(content=str(user_cpa_question))
             ],
-            temperature=0,
+            model=DEEPSEEK_R1_MODE_NAME, # when use the github deepseekR1,the parameter is necessary, if use the azure serverless deepseek R1,it is not necessary
+            temperature=0.6,
             top_p=1
         )
         return response.choices[0].message.content

@@ -54,8 +54,16 @@ These models perform best with straightforward prompts. Some prompt engineering 
 - Be very specific about your end goal: In your instructions, try to give very specific parameters for a successful response, and encourage the model to keep reasoning and iterating until it matches your success criteria.
 - Markdown formatting: Starting with o1-2024-12-17, reasoning models in the API will avoid generating responses with markdown formatting. To signal to the model when you do want markdown formatting in the response, include the string Formatting re-enabled on the first line of your developer message.
 
-*** when you use `<think>` in your prompt，the O-series model will reject your request**
+
+*** about o-series Models, when you use `<think>` in your prompt，the O-series model will reject your request**
 ![](./images/o-series-prompt-restrict.png)
+
+
+*** about Deepseek-R1 model, you should add  "<think>\n" to push it to reason. detail as below, more information you can refer the link** 
+```markdown
+Additionally, we have observed that the DeepSeek-R1 series models tend to bypass thinking pattern (i.e., outputting "<think>\n\n</think>") when responding to certain queries, which can adversely affect the model's performance. To ensure that the model engages in thorough reasoning, we recommend enforcing the model to initiate its response with "<think>\n" at the beginning of every output.
+```
+[DeepSeek-R1#usage-recommendations](https://github.com/deepseek-ai/DeepSeek-R1#usage-recommendations)
 
 #### developer message
 [developer message document](https://platform.openai.com/docs/guides/text-generation#building-prompts)
