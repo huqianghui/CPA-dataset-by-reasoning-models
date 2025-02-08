@@ -14,19 +14,13 @@ from tenacity import (
     stop_after_attempt,
     wait_random_exponential,
 )
-from azure.ai.inference.aio import ChatCompletionsClient
-from azure.core.credentials import AzureKeyCredential
+from roundRobin.azureInferenceClientRoundRobin import azure_ai_inference_client_manager
 
 
 ERROR_CODE = "ERR_001"
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 load_dotenv()
-
-azureDeepSeekClient = ChatCompletionsClient(
-    endpoint=os.environ["AZURE_INFERENCE_ENDPOINT"],
-    credential=AzureKeyCredential(os.environ["AZURE_INFERENCE_CREDENTIAL"]),
-)
 
 DEEPSEEK_R1_MODE_NAME="DeepSeek-R1"
 
@@ -43,9 +37,10 @@ def extract_json_content(text: str) -> str:
         raise ValueError("No valid JSON object found")
     return cleaned_text[start : end + 1]
 
-#@async_diskcache("answer_cpa_by_deepseek_r1_model")
-#@retry(wait=wait_random_exponential(multiplier=1, max=60), stop=stop_after_attempt(3))
+@async_diskcache("answer_cpa_by_deepseek_r1_model")
+@retry(wait=wait_random_exponential(multiplier=1, max=60), stop=stop_after_attempt(3))
 async def answer_cpa_by_deepseek_r1_model(question:str,index:int):
+    azureDeepSeekClient = await azure_ai_inference_client_manager.get_next_client()
     user_cpa_question = cpa_deep_seek_user_prompt.format(cpa_question=question)
     try:
         response = await azureDeepSeekClient.complete(
@@ -83,6 +78,9 @@ async def read_cpa_excel_file():
     # Keep only the "ID", "question", and "answer" columns
     df = df[['ID', 'question', 'answer','difficulitiy']]
 
+    #TODO Limit to the first 60 rows
+    df = df.head(40)
+
     deepSeekOutputs = [None] * len(df)
     deepSeekProcessOutputs = [None] * len(df)
     deepSeekAnswerOutputs = [None] * len(df)
@@ -109,9 +107,11 @@ async def read_cpa_excel_file():
     df['deepseek-R1-result'] = deepSeekOutputs
     df['deepseek-R1-process'] = deepSeekProcessOutputs
     df['deepseek-R1-answer'] = deepSeekAnswerOutputs
-    output_file_path = os.getenv("RESULT_OUTPUT_DIR_PATH") + "/" + "azure_deepseek_R1_result.xlsx"
+    output_file_path = os.getenv("RESULT_OUTPUT_DIR_PATH") + "/" + "azure_deepseek_R1_result[0:60].xlsx"
     logging.info(f"All rows processed. Saving to Excel file, {output_file_path}")
     df.to_excel(output_file_path, index=False)
+
+    await azure_ai_inference_client_manager.close_all_clients()
 
     return output_file_path
         
