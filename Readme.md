@@ -1,6 +1,6 @@
 ## Using Azure OpenAI o-series models usecase
 
-[azure openAI reasoning model introduce](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/reasoning?tabs=python-secure)
+[azreu openAI reasoning model introduce](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/reasoning?tabs=python-secure)
 
 Azure OpenAI o-series models are designed to tackle reasoning and problem-solving tasks with increased focus and capability.
 So I try to use LRM o1-preview,o1-mini,o1 and o3-mini as CPA teacher to anaysis the questions and give out the solution and final answer.
@@ -129,3 +129,21 @@ Using reasoning vs. non-reasoning models depends on task complexity, required re
 - Account for cost and latency when choosing models.
 - Encourage more reasoning for complex tasks
 
+### Test Result Summarization
+
+In the introduction of Deep Research [introducing-deep-research](https://openai.com/index/introducing-deep-research/), OpenAI o3-mini(medium,high) perform better than O1 and DeepSeek R1 on [Humanity’s Last Exam](https://lastexam.ai/)⁠, the detail shows in the below table:
+![](./images/Performances%20on%20Humanity’s%20Last%20Exam.png)
+
+But in my test dataset, DeepSeek R1 performed the best **(only 30 questions were tested due to rate limitations)**, followed by O1, with O3-mini ranking last. For details, refer to the table below.
+
+| Model            | Accuracy (%) |
+|------------------|--------------|
+| O1-mini          | 54.84%       |
+| o3-mini(low)     | 62.39%       |
+| o3-mini(meduium) | 67.69%       |
+| o3-mini(high)    | 68.20%       |
+| o1-preview       | 80.12%       |
+| O1(low)          | 81.24%       |
+| O1(meduium)      | 82.98%       |
+| O1(high)         | 85.42%       |
+| DeepSeek R1      | 96.67%       |
